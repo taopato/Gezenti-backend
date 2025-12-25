@@ -1,5 +1,5 @@
 ﻿using Gezenti.Application.Services.Repositories;
-using Gezenti.Domain;
+using Gezenti.Domain.Entities;
 using Gezenti.Persistence.Contexts;
 using Microsoft.EntityFrameworkCore;
 
@@ -26,8 +26,8 @@ namespace Gezenti.Persistence.Repositories
 
         public async Task<User?> GetByEmailAsync(string email)
         {
-            return await _context.Users
-                .FirstOrDefaultAsync(u => u.Email == email);
+            // ✅ Script: [UserGmail] alanı email gibi kullanılıyor
+            return await _context.Users.FirstOrDefaultAsync(u => u.UserGmail == email);
         }
 
         public async Task AddAsync(User user)

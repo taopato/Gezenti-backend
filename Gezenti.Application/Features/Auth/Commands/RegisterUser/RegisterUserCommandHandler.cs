@@ -1,8 +1,10 @@
-﻿using Gezenti.Application.Common;
+﻿using System.Security.Cryptography;
+using System.Text;
+using Gezenti.Application.Common;
 using Gezenti.Application.Features.Auth.Dtos;
 using Gezenti.Application.Services;
 using Gezenti.Application.Services.Repositories;
-using Gezenti.Domain;
+using Gezenti.Domain.Entities;
 using MediatR;
 
 namespace Gezenti.Application.Features.Auth.Commands.RegisterUser
@@ -23,18 +25,18 @@ namespace Gezenti.Application.Features.Auth.Commands.RegisterUser
             RegisterUserCommand request,
             CancellationToken cancellationToken)
         {
-            // 1) Email var mı?
             var existing = await _userRepository.GetByEmailAsync(request.Email);
             if (existing != null)
                 return ApiResponse<LoggedInUserDto>.Fail("Bu email ile kayıtlı kullanıcı zaten var.", 400);
 
-            // 2) Kullanıcı oluştur
+            CreatePasswordHash(request.Password, out var hash, out var salt);
+
             var user = new User
             {
-                Email = request.Email,
-                FirstName = request.FirstName,
-                LastName = request.LastName,
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
+                UserGmail = request.Email,
+                UserName = $"{request.FirstName} {request.LastName}".Trim(),
+                PasswordHash = hash,
+                PasswordSalt = salt,
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -45,13 +47,20 @@ namespace Gezenti.Application.Features.Auth.Commands.RegisterUser
             var dto = new LoggedInUserDto
             {
                 Id = user.Id,
-                Email = user.Email,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
+                Email = user.UserGmail,
+                FirstName = user.UserName,
+                LastName = null,
                 AccessToken = token
             };
 
             return ApiResponse<LoggedInUserDto>.Success(dto, 201, "Kullanıcı başarıyla kayıt oldu.");
+        }
+
+        private static void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
+        {
+            using var hmac = new HMACSHA512();
+            passwordSalt = hmac.Key;
+            passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
         }
     }
 }

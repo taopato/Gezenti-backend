@@ -1,13 +1,14 @@
-﻿using Gezenti.Application.Features.Auth.Commands;
+﻿using Gezenti.Application.Features.Auth.Commands.ForgotPassword;
 using Gezenti.Application.Features.Auth.Commands.LoginUser;
 using Gezenti.Application.Features.Auth.Commands.RegisterUser;
+using Gezenti.Application.Features.Auth.Commands.ResetPassword;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Gezenti.WebAPI.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -16,19 +17,33 @@ namespace Gezenti.WebAPI.Controllers
         {
             _mediator = mediator;
         }
-        // Kayıt ol ekranı
+
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterUserCommand command)
+        public async Task<IActionResult> Register(RegisterUserCommand command)
         {
             var result = await _mediator.Send(command);
-            return Ok(result);
+            return StatusCode(result.StatusCode, result);
         }
-        // Giriş yap ekranı
+
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginUserCommand command)
+        public async Task<IActionResult> Login(LoginUserCommand command)
         {
             var result = await _mediator.Send(command);
-            return Ok(result);
+            return StatusCode(result.StatusCode, result);
+        }
+
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordCommand command)
+        {
+            var result = await _mediator.Send(command);
+            return StatusCode(result.StatusCode, result);
+        }
+
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword(ResetPasswordCommand command)
+        {
+            var result = await _mediator.Send(command);
+            return StatusCode(result.StatusCode, result);
         }
     }
 }

@@ -1,9 +1,10 @@
-﻿using Gezenti.Application.Common;
+﻿using System.Security.Cryptography;
+using System.Text;
+using Gezenti.Application.Common;
 using Gezenti.Application.Features.Auth.Dtos;
 using Gezenti.Application.Services;
 using Gezenti.Application.Services.Repositories;
 using MediatR;
-using BCrypt.Net;
 
 namespace Gezenti.Application.Features.Auth.Commands.LoginUser
 {
@@ -23,13 +24,12 @@ namespace Gezenti.Application.Features.Auth.Commands.LoginUser
             LoginUserCommand request,
             CancellationToken cancellationToken)
         {
-            // Kullanıcı var mı kısımı
             var user = await _userRepository.GetByEmailAsync(request.Email);
             if (user == null)
                 return ApiResponse<LoggedInUserDto>.Fail("Kullanıcı bulunamadı.", 400);
 
-            // Şifre doğru mu kısmı?
-            var passwordOk = BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash);
+            // ✅ Script uyumlu doğrulama: Hash + Salt (varbinary)
+            var passwordOk = VerifyPasswordHash(request.Password, user.PasswordHash, user.PasswordSalt);
             if (!passwordOk)
                 return ApiResponse<LoggedInUserDto>.Fail("Şifre hatalı.", 400);
 
@@ -38,13 +38,20 @@ namespace Gezenti.Application.Features.Auth.Commands.LoginUser
             var dto = new LoggedInUserDto
             {
                 Id = user.Id,
-                Email = user.Email,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
+                Email = user.UserGmail,
+                FirstName = user.UserName,
+                LastName = null,
                 AccessToken = token
             };
 
             return ApiResponse<LoggedInUserDto>.Success(dto, 200);
+        }
+
+        private static bool VerifyPasswordHash(string password, byte[] storedHash, byte[] storedSalt)
+        {
+            using var hmac = new HMACSHA512(storedSalt);
+            var computed = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
+            return CryptographicOperations.FixedTimeEquals(computed, storedHash);
         }
     }
 }

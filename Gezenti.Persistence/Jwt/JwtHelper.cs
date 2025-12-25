@@ -2,7 +2,7 @@
 using System.Security.Claims;
 using System.Text;
 using Gezenti.Application.Services;
-using Gezenti.Domain;
+using Gezenti.Domain.Entities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
@@ -29,11 +29,12 @@ namespace Gezenti.Persistence.Jwt
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
             var signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
+            // ✅ Script'e göre: UserName, UserGmail
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Name, $"{user.FirstName} {user.LastName}")
+                new Claim(ClaimTypes.Email, user.UserGmail),
+                new Claim(ClaimTypes.Name, user.UserName)
             };
 
             var token = new JwtSecurityToken(

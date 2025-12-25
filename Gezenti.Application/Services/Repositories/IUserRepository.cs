@@ -1,4 +1,4 @@
-﻿using Gezenti.Domain;
+﻿using Gezenti.Domain.Entities;
 
 namespace Gezenti.Application.Services.Repositories
 {

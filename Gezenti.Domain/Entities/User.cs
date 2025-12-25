@@ -1,25 +1,21 @@
 ﻿using Gezenti.Domain.Common;
-using Gezenti.Domain.Enums;
 
-namespace Gezenti.Domain
+namespace Gezenti.Domain.Entities
 {
     public class User : BaseEntity
     {
-        // Ad
-        public string FirstName { get; set; } = null!;
+        public string UserName { get; set; } = null!;
+        public string UserGmail { get; set; } = null!;
 
-        // Soyad
-        public string LastName { get; set; } = null!;
+        public byte[] PasswordHash { get; set; } = null!;
+        public byte[] PasswordSalt { get; set; } = null!;
 
-        public string FullName => $"{FirstName} {LastName}";
+        public DateTime? LastLoginDate { get; set; }
 
-        public string Email { get; set; } = null!;
-
-        public string PasswordHash { get; set; } = null!;
-        //Cinsiyet
-        public Gender Gender { get; set; } = Gender.Unknown;
-
-        public DateTime? BirthDate { get; set; }
-        public string? City { get; set; }
+        public ICollection<UserComment> UserComments { get; set; } = new List<UserComment>();
+        public ICollection<UserFavorite> UserFavorites { get; set; } = new List<UserFavorite>();
+        public ICollection<UserInteraction> UserInteractions { get; set; } = new List<UserInteraction>();
+        public UserPreference? UserPreference { get; set; }
+        public ICollection<UserVisitHistory> UserVisitHistory { get; set; } = new List<UserVisitHistory>();
     }
 }

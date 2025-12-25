@@ -1,8 +1,7 @@
 ﻿namespace Gezenti.Application.Features.Auth.Dtos
 {
-    public class LoginUserDto
+    public class ForgotPasswordDto
     {
         public string Email { get; set; } = null!;
-        public string Password { get; set; } = null!;
     }
 }
