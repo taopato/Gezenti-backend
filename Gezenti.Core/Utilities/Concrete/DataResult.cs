@@ -1,0 +1,25 @@
+﻿using Gezenti.Core.Utilities.Abstrak;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Gezenti.Core.Utilities.Concrete
+{
+    public class DataResult<T> : Result, IDataResult<T>
+    {
+        public DataResult(T data, bool success, string message) : base(success, message)
+        {
+            Data = data;
+        }
+        public DataResult(T data, bool success) : base(success)
+        {
+            Data = data;
+        }
+
+
+
+        public T Data { get; }
+    }
+}
