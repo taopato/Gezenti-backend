@@ -11,11 +11,14 @@ namespace Gezenti.Application
         {
             var assembly = typeof(ApplicationServiceRegistration).Assembly;
 
+       
             services.AddMediatR(cfg =>
             {
                 cfg.RegisterServicesFromAssembly(assembly);
             });
 
+
+      
             services.AddAutoMapper(assembly);
 
             return services;

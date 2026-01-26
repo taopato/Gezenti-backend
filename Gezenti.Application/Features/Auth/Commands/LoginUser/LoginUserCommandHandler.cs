@@ -8,8 +8,7 @@ using MediatR;
 
 namespace Gezenti.Application.Features.Auth.Commands.LoginUser
 {
-    public class LoginUserCommandHandler
-        : IRequestHandler<LoginUserCommand, ApiResponse<LoggedInUserDto>>
+    public class LoginUserCommandHandler : IRequestHandler<LoginUserCommand, ApiResponse<LoggedInUserDto>>
     {
         private readonly IUserRepository _userRepository;
         private readonly ITokenHelper _tokenHelper;

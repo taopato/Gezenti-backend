@@ -22,7 +22,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Gezenti.Application\Gezenti.Application.csproj" />
     <ProjectReference Include="..\Gezenti.Persistence\Gezenti.Persistence.csproj" />
-    <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

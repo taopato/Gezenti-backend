@@ -20,4 +20,8 @@
     <ProjectReference Include="..\Gezenti.Domain\Gezenti.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Features\Mapping\" />
+  </ItemGroup>
+
 </Project>

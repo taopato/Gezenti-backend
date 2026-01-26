@@ -21,6 +21,7 @@ namespace Gezenti.Persistence
                 options.UseSqlServer(connectionString));
 
             services.AddScoped<IUserRepository, EfUserRepository>();
+            services.AddScoped<IPlaceService, EfPlaceRepository>();
             services.AddScoped<ITokenHelper, JwtHelper>();
 
             return services;

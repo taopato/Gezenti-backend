@@ -26,7 +26,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Gezenti.Application\Gezenti.Application.csproj" />
     <ProjectReference Include="..\Gezenti.Domain\Gezenti.Domain.csproj" />
-    <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>

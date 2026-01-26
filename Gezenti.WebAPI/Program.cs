@@ -50,10 +50,10 @@ builder.Services.AddSwaggerGen(options =>
     options.AddSecurityRequirement(securityRequirement);
 });
 
+
 builder.Services.AddApplicationServices();
 builder.Services.AddPersistenceServices(builder.Configuration);
 
-//  CORS – geliştirme için full açık
 builder.Services.AddCors();
 
 var jwtSection = builder.Configuration.GetSection("Jwt");

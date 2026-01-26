@@ -7,7 +7,7 @@ namespace Gezenti.Application.Features.Auth.Commands.ForgotPassword
     public class ForgotPasswordCommandHandler : IRequestHandler<ForgotPasswordCommand, ApiResponse<string>>
     {
         private readonly IUserRepository _userRepository;
-        private readonly IMailService _mailService; // Mail servisini içeri alıyoruz
+        private readonly IMailService _mailService; 
 
         public ForgotPasswordCommandHandler(IUserRepository userRepository, IMailService mailService)
         {
