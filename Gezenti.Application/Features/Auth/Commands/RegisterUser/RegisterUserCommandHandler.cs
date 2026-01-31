@@ -25,8 +25,8 @@ namespace Gezenti.Application.Features.Auth.Commands.RegisterUser
             RegisterUserCommand request,
             CancellationToken cancellationToken)
         {
-            var existing = await _userRepository.GetByEmailAsync(request.Email);
-            if (existing != null)
+            var existingResult = await _userRepository.GetByEmailAsync(request.Email);
+            if (existingResult.Success && existingResult.Data != null)
                 return ApiResponse<LoggedInUserDto>.Fail("Bu email ile kayıtlı kullanıcı zaten var.", 400);
 
             CreatePasswordHash(request.Password, out var hash, out var salt);

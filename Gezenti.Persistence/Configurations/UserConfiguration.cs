@@ -11,7 +11,7 @@ namespace Gezenti.Persistence.Configurations
             builder.ToTable("Users");
 
             builder.HasKey(x => x.Id);
-            builder.Property(x => x.Id).HasColumnName("UserId");
+            builder.Property(x => x.Id).HasColumnName("Id");
 
             builder.Property(x => x.UserName).HasColumnName("UserName").HasMaxLength(100).IsRequired();
             builder.Property(x => x.UserGmail).HasColumnName("UserGmail").HasMaxLength(255).IsRequired();

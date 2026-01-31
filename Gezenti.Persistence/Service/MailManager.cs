@@ -8,7 +8,7 @@ using Gezenti.Application.Services.Repositories;
 using Gezenti.Core.Utilities.Abstrak;
 using Gezenti.Core.Utilities.Concrete; 
 
-namespace Gezenti.Infrastructure.Service
+namespace Gezenti.Persistence.Service
 {
     public class MailManager : IMailService
     {
