@@ -1,16 +1,16 @@
 ﻿using System.Text;
 using Gezenti.Application;
+using Gezenti.Application.Services.Repositories;
 using Gezenti.Persistence;
+using Gezenti.Persistence.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-
 
 builder.Services.AddSwaggerGen(options =>
 {
@@ -19,20 +19,17 @@ builder.Services.AddSwaggerGen(options =>
         Title = "Gezenti.WebAPI",
         Version = "v1"
     });
-
-    var securityScheme = new OpenApiSecurityScheme
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
         Type = SecuritySchemeType.Http,
         Scheme = "bearer",
         BearerFormat = "JWT",
         In = ParameterLocation.Header,
-        Description = "JWT Bearer token girin. Örnek: 'Bearer {token}'"
-    };
+        Description = "Sadece token'ı girin. 'Bearer' yazmayın."
+    });
 
-    options.AddSecurityDefinition("Bearer", securityScheme);
-
-    var securityRequirement = new OpenApiSecurityRequirement
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
             new OpenApiSecurityScheme
@@ -45,20 +42,22 @@ builder.Services.AddSwaggerGen(options =>
             },
             Array.Empty<string>()
         }
-    };
-
-    options.AddSecurityRequirement(securityRequirement);
+    });
 });
-
 
 builder.Services.AddApplicationServices();
 builder.Services.AddPersistenceServices(builder.Configuration);
+builder.Services.AddScoped<IMailService, MailManager>();
 
 builder.Services.AddCors();
 
 var jwtSection = builder.Configuration.GetSection("Jwt");
-var key = Encoding.UTF8.GetBytes(jwtSection["Key"]!);
-
+var jwtKey = jwtSection["Key"];
+if (string.IsNullOrWhiteSpace(jwtKey))
+{
+    throw new Exception("Jwt:Key appsettings içinde bulunamadı. appsettings.Development.json dosyanı kontrol et.");
+}
+var keyBytes = Encoding.UTF8.GetBytes(jwtKey);
 
 builder.Services.AddAuthentication(options =>
 {
@@ -70,7 +69,7 @@ builder.Services.AddAuthentication(options =>
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(key),
+        IssuerSigningKey = new SymmetricSecurityKey(keyBytes),
 
         ValidateIssuer = true,
         ValidateAudience = true,
@@ -92,8 +91,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-app.UseRouting();
 
 app.UseCors(policy =>
 {

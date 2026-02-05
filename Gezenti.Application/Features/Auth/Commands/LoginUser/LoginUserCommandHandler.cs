@@ -19,33 +19,36 @@ namespace Gezenti.Application.Features.Auth.Commands.LoginUser
             _tokenHelper = tokenHelper;
         }
 
-        public async Task<ApiResponse<LoggedInUserDto>> Handle(
-            LoginUserCommand request,
-            CancellationToken cancellationToken)
+        public async Task<ApiResponse<LoggedInUserDto>> Handle(LoginUserCommand request, CancellationToken cancellationToken)
         {
-            var userResult = await _userRepository.GetByEmailAsync(request.Email);
+            var userResult = await _userRepository.GetByEmailAsync(request.Email.Trim());
 
             if (!userResult.Success || userResult.Data == null)
-            {
                 return ApiResponse<LoggedInUserDto>.Fail("Kullanıcı bulunamadı.", 400);
-            }
 
             var user = userResult.Data;
 
+            if (!user.EmailConfirmed)
+                return ApiResponse<LoggedInUserDto>.Fail("Lütfen e-posta doğrulaması yapın.", 403);
+
             var passwordOk = VerifyPasswordHash(request.Password, user.PasswordHash, user.PasswordSalt);
             if (!passwordOk)
-            {
                 return ApiResponse<LoggedInUserDto>.Fail("Şifre hatalı.", 400);
-            }
+
+            user.LastLoginDate = DateTime.UtcNow;
+            await _userRepository.UpdateAsync(user);
 
             var token = _tokenHelper.CreateAccessToken(user);
+
+            var fullName = user.UserName?.Trim() ?? "";
+            var parts = fullName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
             var dto = new LoggedInUserDto
             {
                 Id = user.Id,
                 Email = user.UserGmail,
-                FirstName = user.UserName,
-                LastName = null,
+                FirstName = parts.Length > 0 ? parts[0] : fullName,
+                LastName = parts.Length > 1 ? string.Join(" ", parts.Skip(1)) : null,
                 AccessToken = token
             };
 

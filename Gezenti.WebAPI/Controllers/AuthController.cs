@@ -2,6 +2,7 @@
 using Gezenti.Application.Features.Auth.Commands.LoginUser;
 using Gezenti.Application.Features.Auth.Commands.RegisterUser;
 using Gezenti.Application.Features.Auth.Commands.ResetPassword;
+using Gezenti.Application.Features.Auth.Commands.VerifyEmail;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,6 +21,13 @@ namespace Gezenti.WebAPI.Controllers
 
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterUserCommand command)
+        {
+            var result = await _mediator.Send(command);
+            return StatusCode(result.StatusCode, result);
+        }
+
+        [HttpPost("verify-email")]
+        public async Task<IActionResult> VerifyEmail(VerifyEmailCommand command)
         {
             var result = await _mediator.Send(command);
             return StatusCode(result.StatusCode, result);
