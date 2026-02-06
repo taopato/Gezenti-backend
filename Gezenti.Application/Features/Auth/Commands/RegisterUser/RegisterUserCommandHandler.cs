@@ -9,20 +9,21 @@ using MediatR;
 
 namespace Gezenti.Application.Features.Auth.Commands.RegisterUser
 {
-    public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, ApiResponse<LoggedInUserDto>>
+    public class RegisterUserCommandHandler
+        : IRequestHandler<RegisterUserCommand, ApiResponse<LoggedInUserDto>>
     {
         private readonly IUserRepository _userRepository;
         private readonly ITokenHelper _tokenHelper;
-        private readonly IMailService _mailService;
 
-        public RegisterUserCommandHandler(IUserRepository userRepository, ITokenHelper tokenHelper, IMailService mailService)
+        public RegisterUserCommandHandler(IUserRepository userRepository, ITokenHelper tokenHelper)
         {
             _userRepository = userRepository;
             _tokenHelper = tokenHelper;
-            _mailService = mailService;
         }
 
-        public async Task<ApiResponse<LoggedInUserDto>> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
+        public async Task<ApiResponse<LoggedInUserDto>> Handle(
+            RegisterUserCommand request,
+            CancellationToken cancellationToken)
         {
             var existingResult = await _userRepository.GetByEmailAsync(request.Email);
             if (existingResult.Success && existingResult.Data != null)
@@ -32,29 +33,14 @@ namespace Gezenti.Application.Features.Auth.Commands.RegisterUser
 
             var user = new User
             {
-                UserGmail = request.Email.Trim(),
+                UserGmail = request.Email,
                 UserName = $"{request.FirstName} {request.LastName}".Trim(),
                 PasswordHash = hash,
                 PasswordSalt = salt,
-                CreatedAt = DateTime.UtcNow,
-
-                EmailConfirmed = false,
-                EmailVerificationCode = null,
-                EmailVerificationExpiresAt = null
+                CreatedAt = DateTime.UtcNow
             };
 
             await _userRepository.AddAsync(user);
-
-            // Doğrulama maili gönderme kısmı 
-            var mailResult = await _mailService.SendMail(user.Id, user.UserGmail);
-            if (!mailResult.Success || string.IsNullOrWhiteSpace(mailResult.Data))
-            {
-                return ApiResponse<LoggedInUserDto>.Fail("Kayıt yapıldı ancak doğrulama maili gönderilemedi.", 500);
-            }
-
-            user.EmailVerificationCode = mailResult.Data;
-            user.EmailVerificationExpiresAt = DateTime.UtcNow.AddMinutes(10);
-            await _userRepository.UpdateAsync(user);
 
             var token = _tokenHelper.CreateAccessToken(user);
 
@@ -62,13 +48,12 @@ namespace Gezenti.Application.Features.Auth.Commands.RegisterUser
             {
                 Id = user.Id,
                 Email = user.UserGmail,
-                FirstName = request.FirstName,
-                LastName = request.LastName,
+                FirstName = user.UserName,
+                LastName = null,
                 AccessToken = token
             };
 
-            return ApiResponse<LoggedInUserDto>.Success(dto, 201,
-                "Kayıt başarılı. E-postanıza gelen doğrulama kodu ile hesabınızı doğrulayın.");
+            return ApiResponse<LoggedInUserDto>.Success(dto, 201, "Kullanıcı başarıyla kayıt oldu.");
         }
 
         private static void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)

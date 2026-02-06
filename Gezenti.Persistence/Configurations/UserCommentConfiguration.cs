@@ -8,7 +8,8 @@ namespace Gezenti.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<UserComment> builder)
         {
-            builder.ToTable("UserComments");
+            builder.ToTable("UserComments", t => 
+                t.HasCheckConstraint("CK__UserComme__Ratin__4CA06362", "[Rating] >= 1 AND [Rating] <= 5"));
 
             builder.HasKey(x => x.Id);
             builder.Property(x => x.Id).HasColumnName("Id");
@@ -22,8 +23,6 @@ namespace Gezenti.Persistence.Configurations
 
             builder.Property(x => x.CreatedAt).HasColumnName("CreatedDate").HasDefaultValueSql("getdate()");
             builder.Property(x => x.UpdatedAt).HasColumnName("UpdatedDate");
-
-            builder.HasCheckConstraint("CK__UserComme__Ratin__4CA06362", "[Rating] >= 1 AND [Rating] <= 5");
 
             builder.HasOne(x => x.User)
                 .WithMany(x => x.UserComments)

@@ -1,7 +1,7 @@
 ﻿using Gezenti.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace Gezenti.Persistence.Contexts
+namespace Gezenti.Persistence.Contexts.EntityFramwork
 {
     public class GezentiDbContext : DbContext
     {

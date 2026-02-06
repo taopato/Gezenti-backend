@@ -2,7 +2,7 @@
 using Gezenti.Core.Utilities.Abstrak;
 using Gezenti.Core.Utilities.Concrete;
 using Gezenti.Domain.Entities;
-using Gezenti.Persistence.Contexts;
+using Gezenti.Persistence.Contexts.EntityFramwork;
 using Microsoft.EntityFrameworkCore;
 
 namespace Gezenti.Persistence.Repositories

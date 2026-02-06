@@ -17,32 +17,19 @@ namespace Gezenti.Application.Features.Auth.Commands.ResetPassword
 
         public async Task<ApiResponse<string>> Handle(ResetPasswordCommand request, CancellationToken cancellationToken)
         {
-            var userResult = await _userRepository.GetByEmailAsync(request.Email.Trim());
-            if (!userResult.Success || userResult.Data == null)
-                return ApiResponse<string>.Fail("Kullanıcı bulunamadı.", 404);
+          
 
-            var user = userResult.Data;
+            var user = await _userRepository.GetByEmailAsync(request.Email);
+            if (user == null)
+                return ApiResponse<string>.Fail("Kullanıcı bulunamadı.", 400);
 
-            if (string.IsNullOrWhiteSpace(user.ResetCode) ||
-                user.ResetCodeExpiresAt == null ||
-                user.ResetCodeExpiresAt < DateTime.UtcNow)
-            {
-                return ApiResponse<string>.Fail("Sıfırlama kodu geçersiz veya süresi dolmuş.", 400);
-            }
+          
+            return ApiResponse<string>.Fail(
+                "Şifre yenileme altyapısı (mail + token doğrulama) henüz hazır değil. Şimdilik sadece şablon oluşturuldu.",
+                501
+            );
 
-            if (!string.Equals(user.ResetCode, request.ResetToken.Trim(), StringComparison.Ordinal))
-                return ApiResponse<string>.Fail("Sıfırlama kodu yanlış.", 400);
-
-            CreatePasswordHash(request.NewPassword, out var hash, out var salt);
-
-            user.PasswordHash = hash;
-            user.PasswordSalt = salt;
-            user.ResetCode = null;
-            user.ResetCodeExpiresAt = null;
-
-            await _userRepository.UpdateAsync(user);
-
-            return ApiResponse<string>.Success("Şifre başarıyla güncellendi.", 200);
+         
         }
 
         private static void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)

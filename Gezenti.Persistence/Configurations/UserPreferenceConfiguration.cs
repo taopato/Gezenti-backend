@@ -8,7 +8,8 @@ namespace Gezenti.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<UserPreference> builder)
         {
-            builder.ToTable("UserPreferences");
+            builder.ToTable("UserPreferences", t => 
+                t.HasCheckConstraint("CK__UserPrefe__Budge__3C69FB99", "[BudgetScore] >= 1 AND [BudgetScore] <= 5"));
 
             builder.HasKey(x => x.Id);
             builder.Property(x => x.Id).HasColumnName("Id");
@@ -25,11 +26,9 @@ namespace Gezenti.Persistence.Configurations
             builder.Property(x => x.GastronomyWeight).HasColumnName("GastronomyWeight");
             builder.Property(x => x.ShoppingWeight).HasColumnName("ShoppingWeight");
 
-            // DB’de UpdatedDate var. BaseEntity UpdatedAt’i oraya map’liyoruz.
+            // DB'de UpdatedDate var. BaseEntity UpdatedAt'i oraya map'liyoruz.
             builder.Property(x => x.UpdatedAt).HasColumnName("UpdatedDate").HasDefaultValueSql("getdate()");
             builder.Ignore(x => x.CreatedAt);
-
-            builder.HasCheckConstraint("CK__UserPrefe__Budge__3C69FB99", "[BudgetScore] >= 1 AND [BudgetScore] <= 5");
 
             builder.HasOne(x => x.User)
                 .WithOne(x => x.UserPreference)

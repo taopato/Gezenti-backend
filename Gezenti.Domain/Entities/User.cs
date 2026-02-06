@@ -6,14 +6,7 @@ namespace Gezenti.Domain.Entities
     {
         public string UserName { get; set; } = null!;
         public string UserGmail { get; set; } = null!;
-
-        public bool EmailConfirmed { get; set; } = false;
-        public string? EmailVerificationCode { get; set; }
-        public DateTime? EmailVerificationExpiresAt { get; set; }
-
-        public string? ResetCode { get; set; }   
-        public DateTime? ResetCodeExpiresAt { get; set; }
-
+         public string ResetCode { get; set; } = null!;     
         public byte[] PasswordHash { get; set; } = null!;
         public byte[] PasswordSalt { get; set; } = null!;
 

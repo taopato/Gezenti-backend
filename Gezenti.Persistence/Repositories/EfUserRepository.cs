@@ -2,7 +2,7 @@
 using Gezenti.Core.Utilities.Abstrak;
 using Gezenti.Core.Utilities.Concrete;
 using Gezenti.Domain.Entities;
-using Gezenti.Persistence.Contexts;
+using Gezenti.Persistence.Contexts.EntityFramwork;
 using Microsoft.EntityFrameworkCore;
 
 namespace Gezenti.Persistence.Repositories
@@ -32,10 +32,8 @@ namespace Gezenti.Persistence.Repositories
 
         public async Task<IDataResult<User?>> GetByEmailAsync(string email)
         {
-
-            email = email.Trim();
+       
             var user = await _context.Users.FirstOrDefaultAsync(u => u.UserGmail == email);
-
             if (user != null)
                 return new SuccessDataResult<User?>(user, "Kullanıcı e-posta adresine göre getirildi.");
 
